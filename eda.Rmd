@@ -122,8 +122,61 @@ weather_df |>
   pivot_wider(
     names_from = name,
     values_from = mean_tmax
-  )
+  ) |>
+  knitr::kable(digits = 2)
+#   knitr::kable()
 ```
+
+## Grouped mutate
+
+```{r}
+weather_df |>
+  group_by(name) |>
+  mutate(mean_tmax = mean(tmax, na.rm = TRUE))
+```
+
+```{r}
+weather_df |>
+  group_by(name) |>
+  mutate(
+    mean_tmax = mean(tmax, na.rm = TRUE),
+    centered_tmax = tmax - mean_tmax) |>
+  ggplot(aes(x = date, y = centered_tmax, color = name)) +
+  geom_point()
+```
+
+```{r}
+weather_df |>
+  group_by(name, month) |>
+  mutate(tmax_rank = min_rank(tmax))
+```
+
+```{r}
+weather_df |>
+  group_by(name, month) |>
+  mutate(tmax_rank = min_rank(desc(tmax))) |>
+  filter(tmax_rank <2)
+```
+
+lags
+
+```{r}
+weather_df |>
+  group_by(name) |>
+  mutate(yesterday_tmax = lag(tmax,3))
+```
+
+```{r}
+weather_df |>
+  group_by(name) |>
+  mutate(temp_chamge = tmax - lag(tmax)) |>
+  summarize(
+    sd_temp_change = sd(temp_chamge, na.rm = TRUE)
+    )
+```
+
+
+
 
 
 
